@@ -1,0 +1,10 @@
+.data
+  a 20
+.enddata
+
+.code
+  load a
+  add #1
+  store a
+  syscall 0
+.endcode
