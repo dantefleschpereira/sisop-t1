@@ -17,8 +17,29 @@ class Cpu:
 
     # Escalonador Shortest-Job-First
     def sjf(self):
-        ...
-
+        
+        # Interrupção - se tiver algum processo com tempo de execução menor na fila (o atual vai pro fim)
+        # Interrupção - quando há uma chamada do sistema
+        # Caso o pedido seja de uma impressão ou leitura a partir da chamada do sistema, este processo deverá assumir o estado de bloqueado e um intervalo de tempo de permanência neste estado deverá ser assumido (aleatório entre 8 e 10 unidades de tempo). Passado este tempo, o processo pode avançar para o estado de pronto
+        # guardar os resultados obtidos do programa que foi interrompido.
+        
+        # Ordena a lista de processos prontos de acordo com o tempo de execuçãoão
+        self.fila_prontos.sort(key=lambda x: x.tempo_execucao) #Importante ver a diferença com o tempo de chegada, pois mesmo que um programa seja menor, se ele chegou depois ele só vai entrar na execução quando chegar.
+        
+        # Obtém o próximo processo a ser executado
+        proximo_processo = self.fila_prontos.pop(0)
+        
+        # Executa o processo
+        self.processo_atual = proximo_processo
+        self.quantum = self.processo_atual.quantum
+        self.processo_atual.tempo_restante -= self.quantum
+        print(f"Executando {self.processo_atual}...")
+        
+        # Se o processo ainda tiver tempo restante, coloca-o de volta na fila de processos prontos
+        if self.processo_atual.tempo_restante > 0:
+            self.fila_prontos.append(self.processo_atual)
+        self.processo_atual = None
+ 
     # Escalonador RoudRobin
     # *Pendente: a cada intervalo de tempo, interromper o processador, reavaliar as prioridades
     def rr(self):
