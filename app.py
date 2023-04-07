@@ -6,7 +6,7 @@ from cpu import Cpu
 cpu_ = Cpu()
 
 # Solicita ao usuário qual escalonador ele quer usar
-escalonador = input("Digite 1 para Round Robin ou 2 para Shortest-Job-First: ")
+escalonador = input("Digite '1' para Round Robin ou '2' para Shortest-Job-First: ")
 
 # Executa o escalonador correspondente
 if escalonador == "1":
