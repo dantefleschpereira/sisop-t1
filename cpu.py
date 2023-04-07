@@ -1,3 +1,4 @@
+from memoria import Memoria
 
 class Cpu:
 
@@ -5,15 +6,16 @@ class Cpu:
     def __init__(self):
         self.pc = 0
         self.acc = 0
-        self.memoria = {}
-        self.programa_em_execucao = str()
+        # self.memoria = {}
         self.quantum = None
         self.processo_atual = None
-        self.fila_prontos = [] # Alterar para queue? 
+        # self.fila_prontos = [] # Alterar para queue?
+        self.memoria = Memoria() 
 
     # Método para adicionar processos na fila de prontos
     def adicionar_processo(self, processo):
-        self.fila_prontos.append(processo)
+        # self.fila_prontos.append(processo)
+            self.memoria.fila_prontos.append(processo)
 
     # Escalonador Shortest-Job-First
     def sjf(self):
@@ -23,12 +25,12 @@ class Cpu:
     # *Pendente: a cada intervalo de tempo, interromper o processador, reavaliar as prioridades
     def rr(self):
 
-        while self.fila_prontos:
+        while self.memoria.fila_prontos:
             # Ordena a lista de processos prontos de acordo com a prioridade
-            self.fila_prontos.sort(key=lambda x: x.prioridade)
+            self.memoria.fila_prontos.sort(key=lambda x: x.prioridade)
 
             # Obtém o próximo processo a ser executado
-            proximo_processo = self.fila_prontos.pop(0)
+            proximo_processo = self.memoria.fila_prontos.pop(0)
 
             # Executa o processo
             self.processo_atual = proximo_processo
@@ -46,7 +48,7 @@ class Cpu:
                     continue
                 if secao == '.data':
                     variavel, valor = instrucao.split()
-                    self.memoria[variavel] = int(valor)
+                    self.memoria.memoria_ram[variavel] = int(valor)
                 elif secao == '.code':
                     self.executar_instrucao(instrucao)
                 elif secao == '.enddata':
@@ -56,7 +58,7 @@ class Cpu:
 
             # Se o processo ainda tiver tempo restante, coloca-o de volta na fila de processos prontos
             if self.processo_atual.tempo_restante > 0:
-                self.fila_prontos.append(self.processo_atual)
+                self.memoria.fila_prontos.append(self.processo_atual)
             self.processo_atual = None
 
     def executar_instrucao(self, instr):
@@ -72,7 +74,7 @@ class Cpu:
         elif operacao == 'load':
             self.acc = self.get_operando(op1)
         elif operacao == 'store':
-            self.memoria[op1] = self.acc
+            self.memoria.memoria_ram[op1] = self.acc
         elif operacao == 'brany':
             self.pc = self.get_label(op1)
         elif operacao == 'brpos':
@@ -94,7 +96,7 @@ class Cpu:
         if operando.startswith('#'):
             return int(operando[1:])
         else:
-            return self.memoria[operando]
+            return self.memoria.memoria_ram[operando]
 
     def get_label(self, label):
         return int(label[:-1])
