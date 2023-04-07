@@ -6,6 +6,8 @@ class Processo:
 
     # Construtor com os atributos de um processo
     def __init__(self, id=None, logica=None, tempo_chegada=None, prioridade=None, quantum=None, tempo_execucao=None):
+        # self.pc = 0
+        # self.acc = 0
         self.id = Processo.proximo_id
         self.logica = logica
         self.tempo_chegada = tempo_chegada

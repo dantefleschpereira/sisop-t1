@@ -4,8 +4,8 @@ class Cpu:
 
     # Construtor com os atributos de uma CPU
     def __init__(self):
-        self.pc = 0
-        self.acc = 0
+        # self.pc = 0
+        # self.acc = 0
         # self.memoria = {}
         self.quantum = None
         self.processo_atual = None
