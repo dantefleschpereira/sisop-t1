@@ -16,6 +16,8 @@ class Cpu:
     def adicionar_processo(self, processo):
         # self.fila_prontos.append(processo)
         self.memoria.fila_prontos.append(processo)
+        # Ordena a lista de processos prontos de acordo com a prioridade
+        self.memoria.fila_prontos.sort(key=lambda x: x.prioridade)
 
     # Escalonador Shortest-Job-First
     def sjf(self):
@@ -26,15 +28,13 @@ class Cpu:
     def rr(self):
 
         while self.memoria.fila_prontos:
-            # Ordena a lista de processos prontos de acordo com a prioridade
-            self.memoria.fila_prontos.sort(key=lambda x: x.prioridade)
 
             # Obtém o próximo processo a ser executado
             proximo_processo = self.memoria.fila_prontos.pop(0)
 
             # Executa o processo
             self.processo_atual = proximo_processo
-            quantum = self.processo_atual.quantum
+            # quantum = self.processo_atual.quantum
             print(f"Executando {self.processo_atual}...")
 
             programa = self.processo_atual.logica
@@ -49,16 +49,18 @@ class Cpu:
                     variavel, valor = instrucao.split()
                     self.memoria.memoria_ram[variavel] = int(valor)
                 elif secao == '.code':
-                    self.executar_instrucao(instrucao)
-
-                    self.processo_atual.tempo_ja_ocupou_cpu += 1
-                    self.processo_atual.tempo_restante -= 1
-                    if self.processo_atual.tempo_ja_ocupou_cpu < self.processo_atual.tempo_restante and self.processo_atual.prioridade >= self.memoria.fila_prontos.pop(0).prioridade:
-                        continue
+                    if self.processo_atual.tempo_ja_ocupou_cpu < self.processo_atual.quantum:
+                        self.executar_instrucao(instrucao)
+                        self.processo_atual.tempo_ja_ocupou_cpu += 1
+                        self.processo_atual.tempo_restante -= 1
                     else:
-                        print('Necessário alterar o processo em execução...')
+                        print(
+                            'Necessário alterar o processo em execução e o processo atual volta para fila de prontos...')
+
+                        # Se o processo ainda tiver tempo restante, coloca-o de volta na fila de processos prontos
                         self.memoria.fila_prontos.append(self.processo_atual)
-                        self.processo_atual = None
+                        break
+
                 elif secao == '.enddata':
                     continue
                 else:

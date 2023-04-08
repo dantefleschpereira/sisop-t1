@@ -15,6 +15,7 @@ class Processo:
         self.logica = logica
         self.tempo_chegada = tempo_chegada
         self.prioridade = prioridade
+        self.quantum = quantum
         self.tempo_execucao = tempo_execucao
         self.tempo_restante = tempo_execucao
 
