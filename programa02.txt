@@ -4,7 +4,7 @@
 
 .code
   load a
-  add #1
+  sub #1
   store a
   syscall 0
 .endcode

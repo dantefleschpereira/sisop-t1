@@ -1,21 +1,21 @@
 from memoria import Memoria
 
+
 class Cpu:
 
     # Construtor com os atributos de uma CPU
     def __init__(self):
-        # self.pc = 0
-        # self.acc = 0
+        self.pc = 0
+        self.acc = 0
         # self.memoria = {}
-        self.quantum = None
         self.processo_atual = None
         # self.fila_prontos = [] # Alterar para queue?
-        self.memoria = Memoria() 
+        self.memoria = Memoria()
 
     # Método para adicionar processos na fila de prontos
     def adicionar_processo(self, processo):
         # self.fila_prontos.append(processo)
-            self.memoria.fila_prontos.append(processo)
+        self.memoria.fila_prontos.append(processo)
 
     # Escalonador Shortest-Job-First
     def sjf(self):
@@ -34,10 +34,9 @@ class Cpu:
 
             # Executa o processo
             self.processo_atual = proximo_processo
-            self.quantum = self.processo_atual.quantum
-            self.processo_atual.tempo_restante -= self.quantum # *Talvez alterar a lógica do cálculo de tempo_restante...
+            quantum = self.processo_atual.quantum
             print(f"Executando {self.processo_atual}...")
-            
+
             programa = self.processo_atual.logica
             programa = programa.splitlines()
             secao = ''
@@ -51,15 +50,19 @@ class Cpu:
                     self.memoria.memoria_ram[variavel] = int(valor)
                 elif secao == '.code':
                     self.executar_instrucao(instrucao)
+
+                    self.processo_atual.tempo_ja_ocupou_cpu += 1
+                    self.processo_atual.tempo_restante -= 1
+                    if self.processo_atual.tempo_ja_ocupou_cpu < self.processo_atual.tempo_restante and self.processo_atual.prioridade >= self.memoria.fila_prontos.pop(0).prioridade:
+                        continue
+                    else:
+                        print('Necessário alterar o processo em execução...')
+                        self.memoria.fila_prontos.append(self.processo_atual)
+                        self.processo_atual = None
                 elif secao == '.enddata':
                     continue
                 else:
                     raise Exception(f'Seção Inválida: {secao}')
-
-            # Se o processo ainda tiver tempo restante, coloca-o de volta na fila de processos prontos
-            if self.processo_atual.tempo_restante > 0:
-                self.memoria.fila_prontos.append(self.processo_atual)
-            self.processo_atual = None
 
     def executar_instrucao(self, instr):
         operacao, op1 = instr.split()
@@ -89,7 +92,7 @@ class Cpu:
         elif operacao == 'syscall':
             self.operacoes_syscall(op1)
         else:
-            raise Exception(f'Invalid instruction: {instr}')
+            raise Exception(f'Intrução inválida: {instr}')
         self.pc += 1
 
     def get_operando(self, operando):
