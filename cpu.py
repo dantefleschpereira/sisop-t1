@@ -7,9 +7,8 @@ class Cpu:
     def __init__(self):
         self.pc = 0
         self.acc = 0
-        # self.memoria = {}
+        self.secao = ''
         self.processo_atual = None
-        # self.fila_prontos = [] # Alterar para queue?
         self.memoria = Memoria()
 
     # Método para adicionar processos na fila de prontos
@@ -24,7 +23,6 @@ class Cpu:
         ...
 
     # Escalonador RoudRobin
-    # *Pendente: a cada intervalo de tempo, interromper o processador, reavaliar as prioridades
     def rr(self):
 
         while self.memoria.fila_prontos:
@@ -34,37 +32,60 @@ class Cpu:
 
             # Executa o processo
             self.processo_atual = proximo_processo
-            # quantum = self.processo_atual.quantum
             print(f"Executando {self.processo_atual}...")
 
             programa = self.processo_atual.logica
             programa = programa.splitlines()
-            secao = ''
+            # secao = ''
+            if self.processo_atual.estado == "bloqueado":
+                self.secao = self.processo_atual.status_secao
+                self.pc = self.processo_atual.status_pc
+                self.acc = self.processo_atual.status_acc
+                self.processo_atual.estado = "pronto"
+
+                # fatiar programa
+                programa = programa[self.processo_atual.status_pc:]
+
             for instrucao in programa:
-                instrucao = instrucao.strip()
-                if instrucao.startswith('.'):
-                    secao = instrucao
-                    continue
-                if secao == '.data':
-                    variavel, valor = instrucao.split()
-                    self.memoria.memoria_ram[variavel] = int(valor)
-                elif secao == '.code':
-                    if self.processo_atual.tempo_ja_ocupou_cpu < self.processo_atual.quantum:
+
+                if self.processo_atual.tempo_ja_ocupou_cpu < self.processo_atual.quantum:
+                    self.processo_atual.tempo_ja_ocupou_cpu += 1
+                    self.processo_atual.tempo_restante -= 1
+                    instrucao = instrucao.strip()
+                    if instrucao.startswith('.'):
+                        secao = instrucao
+                        self.secao = secao
+                        self.processo_atual.status_secao = self.secao
+                        self.pc += 1
+                        continue
+                    if secao == '.data':
+                        variavel, valor = instrucao.split()
+                        self.memoria.memoria_ram[variavel] = int(valor)
+                        self.pc += 1
+                    elif secao == '.code':
                         self.executar_instrucao(instrucao)
-                        self.processo_atual.tempo_ja_ocupou_cpu += 1
-                        self.processo_atual.tempo_restante -= 1
+                        self.pc += 1
+                    elif secao == '.enddata':
+                        self.pc += 1
                     else:
-                        print(
-                            'Necessário alterar o processo em execução e o processo atual volta para fila de prontos...')
-
-                        # Se o processo ainda tiver tempo restante, coloca-o de volta na fila de processos prontos
-                        self.memoria.fila_prontos.append(self.processo_atual)
-                        break
-
-                elif secao == '.enddata':
-                    continue
+                        raise Exception(f'Seção Inválida: {secao}')
                 else:
-                    raise Exception(f'Seção Inválida: {secao}')
+                    print(
+                        'Necessário alterar o processo em execução e o processo atual volta para fila de prontos...')
+
+                    # Guarda as informações de onde o processo parou
+                    self.processo_atual.status_pc = self.pc
+                    self.processo_atual.status_acc = self.acc
+                    self.processo_atual.status_secao = self.secao
+                    self.processo_atual.estado = "bloqueado"
+
+                    # Reinicializa os valores
+                    # self.pc = 0
+                    self.processo_atual.tempo_ja_ocupou_cpu = 0
+
+                    # Se o processo atual ainda tiver tempo restante, coloca-o de volta na fila de processos prontos
+                    self.memoria.fila_prontos.append(self.processo_atual)
+                    break
 
     def executar_instrucao(self, instr):
         operacao, op1 = instr.split()
@@ -95,7 +116,7 @@ class Cpu:
             self.operacoes_syscall(op1)
         else:
             raise Exception(f'Intrução inválida: {instr}')
-        self.pc += 1
+        # self.pc += 1
 
     def get_operando(self, operando):
         if operando.startswith('#'):

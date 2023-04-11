@@ -5,11 +5,12 @@ class Processo:
     proximo_pid = 1
 
     # Construtor com os atributos de um processo
-    def __init__(self, id=None, logica=None, tempo_chegada=None, prioridade=None, quantum=None, tempo_execucao=None):
+    def __init__(self, logica=None, tempo_chegada=None, prioridade=None, quantum=None, tempo_execucao=None):
 
         self.pid = Processo.proximo_pid
         self.status_pc = 0
         self.status_acc = 0
+        self.status_secao = ''
         self.tempo_ja_ocupou_cpu = 0
         self.estado = "pronto"
         self.logica = logica
