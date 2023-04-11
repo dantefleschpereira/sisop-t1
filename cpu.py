@@ -1,4 +1,4 @@
-from memoria import Memoria
+from memoria import NovaMemoria
 
 
 class Cpu:
@@ -9,7 +9,8 @@ class Cpu:
         self.acc = 0
         self.secao = ''
         self.processo_atual = None
-        self.memoria = Memoria()
+        # self.memoria = Memoria()
+        self.memoria = NovaMemoria()
 
     # Método para adicionar processos na fila de prontos
     def adicionar_processo(self, processo):
@@ -24,6 +25,8 @@ class Cpu:
 
     # Escalonador RoudRobin
     def rr(self):
+
+        global variavel
 
         while self.memoria.fila_prontos:
 
@@ -60,7 +63,8 @@ class Cpu:
                         continue
                     if secao == '.data':
                         variavel, valor = instrucao.split()
-                        self.memoria.memoria_ram[variavel] = int(valor)
+                        # self.memoria.memoria_ram[variavel] = int(valor)
+                        self.memoria.armazenar(self.processo_atual.pid, variavel, valor)
                         self.pc += 1
                     elif secao == '.code':
                         self.executar_instrucao(instrucao)
@@ -98,7 +102,8 @@ class Cpu:
         elif operacao == 'load':
             self.acc = self.get_operando(op1)
         elif operacao == 'store':
-            self.memoria.memoria_ram[op1] = self.acc
+            # self.memoria.memoria_ram[op1] = self.acc
+            self.memoria.armazenar(self.processo_atual.pid, variavel, self.acc)
         elif operacao == 'brany':
             self.pc = self.get_label(op1)
         elif operacao == 'brpos':
@@ -120,7 +125,8 @@ class Cpu:
         if operando.startswith('#'):
             return int(operando[1:])
         else:
-            return self.memoria.memoria_ram[operando]
+            # return self.memoria.memoria_ram[operando]
+            return self.memoria.consultar(self.processo_atual.pid, variavel)
 
     def get_label(self, label):
         return int(label[:-1])
