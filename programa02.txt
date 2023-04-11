@@ -1,10 +1,10 @@
 .data
-  a 20
+  b 20
 .enddata
 
 .code
-  load a
+  load b
   sub #1
-  store a
+  store b
   syscall 0
 .endcode
