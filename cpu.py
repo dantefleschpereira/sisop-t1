@@ -43,7 +43,7 @@ class Cpu:
                 self.acc = self.processo_atual.status_acc
                 self.processo_atual.estado = "pronto"
 
-                # fatiar programa
+                # Fatiar programa para continuar de onde parou
                 programa = programa[self.processo_atual.status_pc:]
 
             for instrucao in programa:
@@ -70,8 +70,8 @@ class Cpu:
                     else:
                         raise Exception(f'Seção Inválida: {secao}')
                 else:
-                    print(
-                        'Necessário alterar o processo em execução e o processo atual volta para fila de prontos...')
+                    print('Fim do tempo de ocupação do processo no processador')
+                    print('Processo atual voltará para fila de prontos...')
 
                     # Guarda as informações de onde o processo parou
                     self.processo_atual.status_pc = self.pc
@@ -79,8 +79,6 @@ class Cpu:
                     self.processo_atual.status_secao = self.secao
                     self.processo_atual.estado = "bloqueado"
 
-                    # Reinicializa os valores
-                    # self.pc = 0
                     self.processo_atual.tempo_ja_ocupou_cpu = 0
 
                     # Se o processo atual ainda tiver tempo restante, coloca-o de volta na fila de processos prontos
