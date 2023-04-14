@@ -12,6 +12,12 @@ class Cpu:
         self.memoria = Memoria()
 
     # Método para adicionar processos na fila de prontos
+    def adicionar_processoSJF(self, processo):
+        # self.fila_prontos.append(processo)
+        self.memoria.fila_prontos.append(processo)
+        # Ordena a lista de processos prontos de acordo com a prioridade
+        self.memoria.fila_prontos.sort(key=lambda x: x.tempo_restante)
+    
     def adicionar_processo(self, processo):
         # self.fila_prontos.append(processo)
         self.memoria.fila_prontos.append(processo)
@@ -20,7 +26,42 @@ class Cpu:
 
     # Escalonador Shortest-Job-First
     def sjf(self):
-        ...
+
+        while self.memoria.fila_prontos:
+
+            # Obtém o próximo processo a ser executado, sendo o que tem menor tempo de execução
+            proximo_processo = self.memoria.fila_prontos.pop(0)
+
+            # Executa o processo
+            self.processo_atual = proximo_processo
+            print(f"Executando {self.processo_atual}...")
+            
+            programa = self.processo_atual.logica # Imagino que seja o programa asm que o processo tem
+            programa = programa.splitlines()
+            
+            for instrucao in programa:
+                if self.processo_atual.tempo_restante > 0:
+                    self.processo_atual.tempo_restante -= 1
+                    instrucao = instrucao.strip()
+                    if instrucao.startswith('.'):
+                        secao = instrucao
+                        self.secao = secao
+                        self.processo_atual.status_secao = self.secao
+                        self.pc += 1
+                        continue
+                    if secao == '.data':
+                        variavel, valor = instrucao.split()
+                        self.memoria.memoria_ram[variavel] = int(valor)
+                        self.pc += 1
+                    elif secao == '.code':
+                        self.executar_instrucao(instrucao)
+                        self.pc += 1
+                    elif secao == '.enddata':
+                        self.pc += 1
+                    else:
+                        raise Exception(f'Seção Inválida: {secao}')
+                else:
+                    print(f"Fim da execução do {self.processo_atual}...")
 
     # Escalonador RoudRobin
     def rr(self):
