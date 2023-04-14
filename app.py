@@ -36,6 +36,7 @@ if escalonador == "1":
 
     # Executa Round Robin
     cpu_.rr()
+
 elif escalonador == "2":
 
     # Solicita ao usuário a quantidade de programas que deseja criar
@@ -56,7 +57,8 @@ elif escalonador == "2":
         process.carregar_instrucoes(arquivo)
 
         # Adiciona o processo na lista de processos prontos
-        cpu_.adicionar_processo(process)
+        # self.fila_prontos.append(processo)
+        cpu_.adicionar_processoSJF(process)
 
     # Executa Shortest-Job-First
     cpu_.sjf()
