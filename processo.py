@@ -12,7 +12,7 @@ class Processo:
         self.status_acc = 0
         self.status_secao = ''
         self.tempo_ja_ocupou_cpu = 0
-        self.estado = "pronto"
+        self.estado = 'new'
         self.logica = logica
         self.tempo_chegada = tempo_chegada
         self.prioridade = prioridade
