@@ -20,8 +20,8 @@ class Cpu:
 
     # Escalonador Shortest-Job-First
     def sjf(self):
-        ...
-
+        menor_processo = min(self.memoria.fila_prontos, key=lambda x: x.tempo_execucao)
+        print(menor_processo)
     # Escalonador RoudRobin
     def rr(self):
 
