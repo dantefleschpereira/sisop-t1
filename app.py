@@ -31,7 +31,7 @@ if escalonador == "1":
         # Carrega as instruções que estão no arquivo.txt na lógica do processo que foi criado
         process.carregar_instrucoes(arquivo)
 
-        # Adiciona o processo na lista de processos prontos
+        # Adiciona o processo na lista de processos prontos        
         cpu_.adicionar_processo(process)
 
     # Executa Round Robin

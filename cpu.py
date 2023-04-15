@@ -13,17 +13,87 @@ class Cpu:
 
     # Método para adicionar processos na fila de prontos
     def adicionar_processo(self, processo):
-        # self.fila_prontos.append(processo)
+        processo.estado = 'ready'
         self.memoria.fila_prontos.append(processo)
-        # Ordena a lista de processos prontos de acordo com a prioridade
-        self.memoria.fila_prontos.sort(key=lambda x: x.prioridade)
 
     # Escalonador Shortest-Job-First
+
     def sjf(self):
-        ...
+        # menor_processo = min(self.memoria.fila_prontos, key=lambda x: x.tempo_execucao)
+
+        while self.memoria.fila_prontos:
+
+            # Obtém o próximo processo a ser executado
+            proximo_processo = min(self.memoria.fila_prontos,
+                                   key=lambda x: x.tempo_execucao)
+            self.memoria.fila_prontos.pop(0)
+
+            # Executa o processo
+            self.processo_atual = proximo_processo
+            self.processo_atual.estado = 'running'
+            print(f"\nExecutando {self.processo_atual}...")
+
+            programa = self.processo_atual.logica
+            programa = programa.splitlines()
+
+            if self.processo_atual.tempo_restante != self.processo_atual.tempo_execucao:
+                self.secao = self.processo_atual.status_secao
+                self.pc = self.processo_atual.status_pc
+                self.acc = self.processo_atual.status_acc
+                self.processo_atual.estado = "ready"
+
+                # Fatiar programa para continuar de onde parou
+                programa = programa[self.processo_atual.status_pc:]
+
+            for instrucao in programa:
+                # precisa verificar se é o menor na fila de processos a cada instrucao
+                menor_tempo_execucao = min(self.memoria.fila_prontos, key=lambda x: x.tempo_execucao)
+            
+                if self.processo_atual.tempo_restante <= menor_tempo_execucao.tempo_execucao:
+                    self.processo_atual.tempo_ja_ocupou_cpu += 1
+                    self.processo_atual.tempo_restante -= 1
+                    instrucao = instrucao.strip()
+                    if instrucao.startswith('.'):
+                        secao = instrucao
+                        self.secao = secao
+                        self.processo_atual.status_secao = self.secao
+                        self.pc += 1
+                        continue
+                    if secao == '.data':
+                        variavel, valor = instrucao.split()
+                        self.memoria.memoria_ram[variavel] = int(valor)
+                        self.pc += 1
+                    elif secao == '.code':
+                        self.executar_instrucao(instrucao)
+                        self.pc += 1
+                    elif secao == '.enddata':
+                        self.pc += 1
+                    elif secao == '.endcode':
+                        print(
+                            f'Processo {self.processo_atual.pid} executou tadas as suas instruções')
+                        break
+                    else:
+                        raise Exception(f'Seção Inválida: {secao}')
+                else:
+                    print('Fim do tempo de ocupação do processo no processador')
+
+                    # Guarda as informações de onde o processo parou
+                    self.processo_atual.status_pc = self.pc
+                    self.processo_atual.status_acc = self.acc
+                    self.processo_atual.status_secao = self.secao
+                    self.processo_atual.estado = "ready"
+
+                    self.processo_atual.tempo_ja_ocupou_cpu = 0
+
+                    # Se o processo atual ainda tiver tempo restante, coloca-o de volta na fila de processos prontos
+                    self.memoria.fila_prontos.append(self.processo_atual)
+                    break
+        print('\nFim do Sistema de Execução Dinâmica de Processos\n')
 
     # Escalonador RoudRobin
     def rr(self):
+
+        self.memoria.fila_prontos.sort(key=lambda x: x.prioridade)
 
         while self.memoria.fila_prontos:
 
@@ -32,16 +102,17 @@ class Cpu:
 
             # Executa o processo
             self.processo_atual = proximo_processo
-            print(f"Executando {self.processo_atual}...")
+            self.processo_atual.estado = 'running'
+            print(f"\nExecutando {self.processo_atual}...")
 
             programa = self.processo_atual.logica
             programa = programa.splitlines()
-            # secao = ''
-            if self.processo_atual.estado == "bloqueado":
+
+            if self.processo_atual.tempo_restante != self.processo_atual.tempo_execucao:
                 self.secao = self.processo_atual.status_secao
                 self.pc = self.processo_atual.status_pc
                 self.acc = self.processo_atual.status_acc
-                self.processo_atual.estado = "pronto"
+                self.processo_atual.estado = "ready"
 
                 # Fatiar programa para continuar de onde parou
                 programa = programa[self.processo_atual.status_pc:]
@@ -67,23 +138,27 @@ class Cpu:
                         self.pc += 1
                     elif secao == '.enddata':
                         self.pc += 1
+                    elif secao == '.endcode':
+                        print(
+                            f'Processo {self.processo_atual.pid} executou tadas as suas instruções')
+                        break
                     else:
                         raise Exception(f'Seção Inválida: {secao}')
                 else:
                     print('Fim do tempo de ocupação do processo no processador')
-                    print('Processo atual voltará para fila de prontos...')
 
                     # Guarda as informações de onde o processo parou
                     self.processo_atual.status_pc = self.pc
                     self.processo_atual.status_acc = self.acc
                     self.processo_atual.status_secao = self.secao
-                    self.processo_atual.estado = "bloqueado"
+                    self.processo_atual.estado = "ready"
 
                     self.processo_atual.tempo_ja_ocupou_cpu = 0
 
                     # Se o processo atual ainda tiver tempo restante, coloca-o de volta na fila de processos prontos
                     self.memoria.fila_prontos.append(self.processo_atual)
                     break
+        print('\nFim do Sistema de Execução Dinâmica de Processos\n')
 
     def executar_instrucao(self, instr):
         operacao, op1 = instr.split()
@@ -127,10 +202,14 @@ class Cpu:
 
     def operacoes_syscall(self, indice):
         if indice == '0':
-            exit(0)
+            # exit(0)
+            print('Esse processo foi encerrado por syscall')
         elif indice == '1':
             print(self.acc)
         elif indice == '2':
             self.acc = int(input("Informe um valor inteiro: "))
         else:
             raise Exception(f'Comando inválido: {indice}')
+
+def encontrar_menor_tempo_execucao(fila_processos):
+    return min(fila_processos, key=lambda x: x.tempo_execucao)
