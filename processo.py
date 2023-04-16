@@ -23,7 +23,7 @@ class Processo:
         Processo.proximo_pid += 1
 
     def __repr__(self):
-        return f"Processo {self.pid} (prioridade: {self.prioridade}, quantum: {self.quantum}, tempo execução: {self.tempo_execucao}, tempo restante: {self.tempo_restante})"
+        return f"Processo {self.pid} (prioridade: {self.prioridade}, quantum: {self.quantum}, tempo execução: {self.tempo_execucao}, tempo chegada: {self.tempo_chegada} , tempo restante: {self.tempo_restante})"
 
     # Carrega as instruções que estão no arquivo.txt direto na logica do processo
     def carregar_instrucoes(self, nome_do_arquivo):

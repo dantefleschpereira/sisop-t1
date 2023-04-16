@@ -1,7 +1,6 @@
 .data
   b 20
 .enddata
-
 .code
   load b
   sub #1
