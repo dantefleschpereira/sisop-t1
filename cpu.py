@@ -19,14 +19,13 @@ class Cpu:
     # Escalonador Shortest-Job-First
 
     def sjf(self):
-        # menor_processo = min(self.memoria.fila_prontos, key=lambda x: x.tempo_execucao)
+
+        self.memoria.fila_prontos.sort(key=lambda x: x.tempo_chegada)
 
         while self.memoria.fila_prontos:
 
             # Obtém o próximo processo a ser executado
-            proximo_processo = min(self.memoria.fila_prontos,
-                                   key=lambda x: x.tempo_execucao)
-            self.memoria.fila_prontos.pop(0)
+            proximo_processo = self.memoria.fila_prontos.pop(0)
 
             # Executa o processo
             self.processo_atual = proximo_processo
@@ -36,7 +35,7 @@ class Cpu:
             programa = self.processo_atual.logica
             programa = programa.splitlines()
 
-            if self.processo_atual.tempo_restante != self.processo_atual.tempo_execucao:
+            if self.processo_atual.tempo_restante <= self.memoria.fila_prontos[0].tempo_execucao:
                 self.secao = self.processo_atual.status_secao
                 self.pc = self.processo_atual.status_pc
                 self.acc = self.processo_atual.status_acc

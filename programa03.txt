@@ -6,6 +6,7 @@
   load b
   sub #1
   sub #2
+  sub #1
   store b
   syscall 0
 .endcode
