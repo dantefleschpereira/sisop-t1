@@ -35,7 +35,7 @@ class Cpu:
             programa = self.processo_atual.logica
             programa = programa.splitlines()
 
-            if self.processo_atual.tempo_restante <= self.memoria.fila_prontos[0].tempo_execucao:
+            if self.processo_atual.tempo_restante != self.processo_atual.tempo_execucao:
                 self.secao = self.processo_atual.status_secao
                 self.pc = self.processo_atual.status_pc
                 self.acc = self.processo_atual.status_acc
