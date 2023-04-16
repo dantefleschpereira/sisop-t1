@@ -1,12 +1,11 @@
 .data
-  b 20
+  c 20
 .enddata
-
 .code
-  load b
+  load c
   sub #1
   sub #2
-  sub #1
-  store b
+  sub #3
+  store c
   syscall 0
 .endcode
