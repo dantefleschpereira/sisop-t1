@@ -72,8 +72,6 @@ class Cpu:
                     elif secao == '.enddata':
                         self.pc += 1
                     elif secao == '.endcode':
-                        print(
-                            f'Processo {self.processo_atual.pid} executou tadas as suas instruções')
                         break
                     else:
                         raise Exception(f'Seção Inválida: {secao}')
