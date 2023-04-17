@@ -95,7 +95,7 @@ class Cpu:
                             self.processo_atual.tempo_ja_ocupou_cpu = 0
                             self.pc = 0
 
-                            # Se o processo atual ainda tiver tempo restante, coloca-o de volta na fila de processos prontos
+                            # Coloca-o de volta na fila de processos prontos
                             self.memoria.fila_prontos.append(
                                 self.processo_atual)
                             break
