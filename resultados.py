@@ -46,4 +46,4 @@ if __name__ == '__main__':
 
     # Imprime o tempo de espera de cada processo
     for i in range(len(waiting_time)):
-        print("Tempo de espera do processo", i+1, "é:", waiting_time[i])
+        print("Tempo de espera do processo", i+1, "=", waiting_time[i])
