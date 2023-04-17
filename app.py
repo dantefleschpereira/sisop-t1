@@ -36,7 +36,6 @@ if escalonador == "1":
         cpu_.adicionar_processo(process)
 
     # Executa Round Robin
-    cpu_.compile()
 elif escalonador == "2":
 
     # Solicita ao usuário a quantidade de programas que deseja criar

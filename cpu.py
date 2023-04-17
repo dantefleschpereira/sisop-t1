@@ -6,6 +6,7 @@ class Cpu:
         self.pc = 0
         self.acc = 0
         self.memoria = {}
+        self.memInst = []
         self.programa_em_execucao = str()
         self.quantum = None
         self.processo_atual = None
@@ -14,63 +15,6 @@ class Cpu:
     # Método para adicionar processos na fila de prontos
     def adicionar_processo(self, processo):
         self.fila_prontos.append(processo)
-
-    def readMem(self, instrucoes):
-        print(instrucoes.pop(0))
-        for n in range(len(instrucoes)):
-            instrucao = instrucoes[0].strip()
-            print(instrucao)
-            if(instrucao == '.enddata'):
-                instrucoes.pop(0)
-                return instrucoes
-            variavel, valor = instrucao.split()
-            self.memoria[variavel] = int(valor)
-            print(len(instrucoes))
-            print(instrucoes.pop(0))
-            print(len(instrucoes))
-            print()
-        raise Exception(f'.enddata not found')
-        ...    
-    
-    def compile(self):
-        while self.fila_prontos:
-            # Ordena a lista de processos prontos de acordo com a prioridade
-            self.fila_prontos.sort(key=lambda x: x.prioridade)
-
-            # Obtém o próximo processo a ser executado
-            proximo_processo = self.fila_prontos.pop(0)
-
-            # Executa o processo
-            self.processo_atual = proximo_processo
-            self.quantum = self.processo_atual.quantum
-            self.processo_atual.tempo_restante -= self.quantum # *Talvez alterar a lógica do cálculo de tempo_restante...
-            print(f"Executando {self.processo_atual}...")
-            secao = ''
-            
-            programa = self.processo_atual.logica
-            programa = programa.splitlines()
-            for instrucao in programa:
-                instrucao = instrucao.strip()
-                print(instrucao)
-                if instrucao == '.data':
-                    self.readMem(programa)
-                    print(programa)
-                    print(self.memoria)
-                elif instrucao == '.code':
-                    secao = '.code'
-                    print(f'secao eh {secao}')
-                elif secao == '.code':
-                    if instrucao == '.endcode':
-                        break
-                    print(f'rodando instrucao: {instrucao}')
-                    self.executar_instrucao(instrucao)
-                else:
-                    raise Exception(f'Seção Inválida: {instrucao}')
-
-            # Se o processo ainda tiver tempo restante, coloca-o de volta na fila de processos prontos
-            if self.processo_atual.tempo_restante > 0:
-                self.fila_prontos.append(self.processo_atual)
-            self.processo_atual = None
     
     # Escalonador Shortest-Job-First
     def sjf(self):

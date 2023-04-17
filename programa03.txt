@@ -1,0 +1,13 @@
+.data
+  a 20
+.enddata
+
+.code
+  load a
+  add #1
+  brany ponto
+  brany ponto
+  brany ponto
+  store a
+  ponto: syscall 0
+.endcode
