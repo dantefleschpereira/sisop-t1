@@ -217,7 +217,7 @@ class Cpu:
                     if len(self.memoria.fila_prontos) > 0:
                         processo_prioritario = min(
                             self.memoria.fila_prontos, key=lambda x: x.prioridade)
-                        # precisa verificar se tem a prioridade de exec na fila de processos prontos a cada instrucao
+                        # Precisa verificar se tem a prioridade de exec na fila de processos prontos a cada instrucao
                         if self.processo_atual.prioridade > processo_prioritario.prioridade:
 
                             # Guarda as informações de onde o processo parou
@@ -230,7 +230,7 @@ class Cpu:
                             self.processo_atual.tempo_ja_ocupou_cpu = 0
                             self.pc = 0
 
-                            # Se o processo atual ainda tiver tempo restante, coloca-o de volta na fila de processos prontos
+                            # Coloca-o de volta na fila de processos prontos
                             self.memoria.fila_prontos.append(
                                 self.processo_atual)
                             break
