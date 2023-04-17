@@ -1,0 +1,19 @@
+.data
+    a 10
+    b 0
+.enddata
+
+.code
+    load a
+loop:
+    add b
+    store b
+    syscall 1
+    load a
+    sub #1
+    store a
+
+    syscall 1
+    brpos loop
+    syscall 0
+.endcode

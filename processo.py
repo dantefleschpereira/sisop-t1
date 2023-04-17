@@ -53,12 +53,11 @@ class Processo:
         branchAux = {}
         labelAux = {}
         noIdLabel = {}
-        print(instrucoes.pop(0))
+        instrucoes.pop(0)
         for n in range(len(instrucoes)):
             instrucao = instrucoes[0].strip()
-            print(instrucao)
             if(instrucao == '.endcode'):
-                instrucoes.pop(0)
+                self.memIns.append(instrucoes.pop(0))
                 return
             aux = re.search(r"^(\w+):(\s(\w+\s\w+))?", instrucao)
             if(aux):
@@ -85,12 +84,10 @@ class Processo:
                     noIdLabel[valor] = [n]
                 else:
                     noIdLabel[valor].append(n)
-                    
-
-            self.memIns.append(instrucoes.pop(0))
+            self.memIns.append(instrucao)
+            instrucoes.pop(0)
         raise Exception(f'.endcode not found')
             
-     
     def compile(self):
         programa = self.logica.splitlines()
         programa = list(filter(lambda ins: ins != '', programa))
@@ -108,5 +105,5 @@ class Processo:
         print(self.memIns)
 
 process = Processo(tempo_chegada=0, prioridade=1, quantum=1, tempo_execucao=1)
-process.carregar_instrucoes('programa03.txt')
+process.carregar_instrucoes('programa04.txt')
 process.compile()
