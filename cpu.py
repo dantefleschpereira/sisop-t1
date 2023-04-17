@@ -40,16 +40,15 @@ class Cpu:
             # Caso diferente significa que o programa já foi executado algum vez então é preciso salvar as info
             if self.processo_atual.tempo_restante != self.processo_atual.tempo_execucao:
                 self.secao = self.processo_atual.status_secao
-                secao = self.secao #?
+                secao = self.secao  # ?
                 self.pc = self.processo_atual.status_pc
                 self.acc = self.processo_atual.status_acc
                 self.processo_atual.estado = "ready"
 
-                # Fatiar programa para continuar de onde parou
+                # Fatiar programa conforme pc para continuar de onde parou
                 programa = programa[self.processo_atual.status_pc:]
 
             for instrucao in programa:
-
                 if self.processo_atual.tempo_restante == self.processo_atual.tempo_execucao:
                     self.processo_atual.tempo_ja_ocupou_cpu += 1
                     self.processo_atual.tempo_restante -= 1
@@ -82,15 +81,14 @@ class Cpu:
                         menor_tempo_execucao = min(
                             self.memoria.fila_prontos, key=lambda x: x.tempo_execucao)
                         if self.processo_atual.tempo_restante > menor_tempo_execucao.tempo_restante:
+
                             # Guarda as informações de onde o processo parou
                             print(
                                 'Fim do tempo de ocupação do processo no processador')
-
                             self.processo_atual.status_pc = self.pc
                             self.processo_atual.status_acc = self.acc
                             self.processo_atual.status_secao = self.secao
                             self.processo_atual.estado = "ready"
-
                             self.processo_atual.tempo_ja_ocupou_cpu = 0
                             self.pc = 0
 
@@ -151,10 +149,9 @@ class Cpu:
         print('\nFim do Sistema de Execução Dinâmica de Processos\n')
 
     # Escalonador RoudRobin
-
     def rr(self):
 
-        self.memoria.fila_prontos.sort(key=lambda x: x.prioridade)
+        self.memoria.fila_prontos.sort(key=lambda x: x.tempo_chegada)
 
         while self.memoria.fila_prontos:
 
@@ -164,23 +161,28 @@ class Cpu:
             # Executa o processo
             self.processo_atual = proximo_processo
             self.processo_atual.estado = 'running'
+            self.pc = self.processo_atual.status_pc
+            self.acc = self.processo_atual.status_acc
+            self.secao = self.processo_atual.status_secao
             print(f"\nExecutando {self.processo_atual}...")
 
             programa = self.processo_atual.logica
             programa = programa.splitlines()
 
+            # Caso diferente significa que o programa já foi executado algum vez então é preciso salvar as info
             if self.processo_atual.tempo_restante != self.processo_atual.tempo_execucao:
                 self.secao = self.processo_atual.status_secao
+                secao = self.secao
                 self.pc = self.processo_atual.status_pc
                 self.acc = self.processo_atual.status_acc
                 self.processo_atual.estado = "ready"
 
-                # Fatiar programa para continuar de onde parou
+                # Fatiar programa conforme pc para continuar de onde parou
                 programa = programa[self.processo_atual.status_pc:]
 
             for instrucao in programa:
-
-                if self.processo_atual.tempo_ja_ocupou_cpu < self.processo_atual.quantum:
+                # Se tempo_restante = tempo_execução signica que é a primeira vez que o processo é executado
+                if self.processo_atual.tempo_restante == self.processo_atual.tempo_execucao:
                     self.processo_atual.tempo_ja_ocupou_cpu += 1
                     self.processo_atual.tempo_restante -= 1
                     instrucao = instrucao.strip()
@@ -193,6 +195,8 @@ class Cpu:
                     if secao == '.data':
                         variavel, valor = instrucao.split()
                         self.memoria.memoria_ram[variavel] = int(valor)
+                        for chave, valor in self.memoria.memoria_ram.items():
+                            print(f'Valor de {chave} = {valor}')
                         self.pc += 1
                     elif secao == '.code':
                         self.executar_instrucao(instrucao)
@@ -200,25 +204,82 @@ class Cpu:
                     elif secao == '.enddata':
                         self.pc += 1
                     elif secao == '.endcode':
-                        print(
-                            f'Processo {self.processo_atual.pid} executou tadas as suas instruções')
                         break
                     else:
                         raise Exception(f'Seção Inválida: {secao}')
                 else:
-                    print('Fim do tempo de ocupação do processo no processador')
+                    # Se não for a primeira vez que o processo é executado...
+                    print('Verificando chegada de processos...')
+                    if len(self.memoria.fila_prontos) > 0:
+                        # precisa verificar se tem a prioridade de exec na fila de processos prontos a cada instrucao
+                        processo_prioritario = min(
+                            self.memoria.fila_prontos, key=lambda x: x.prioridade)
+                        if self.processo_atual.prioridade > processo_prioritario.prioridade:
 
-                    # Guarda as informações de onde o processo parou
-                    self.processo_atual.status_pc = self.pc
-                    self.processo_atual.status_acc = self.acc
-                    self.processo_atual.status_secao = self.secao
-                    self.processo_atual.estado = "ready"
+                            # Guarda as informações de onde o processo parou
+                            print(
+                                'Fim do tempo de ocupação do processo no processador')
+                            self.processo_atual.status_pc = self.pc
+                            self.processo_atual.status_acc = self.acc
+                            self.processo_atual.status_secao = self.secao
+                            self.processo_atual.estado = "ready"
+                            self.processo_atual.tempo_ja_ocupou_cpu = 0
+                            self.pc = 0
 
-                    self.processo_atual.tempo_ja_ocupou_cpu = 0
-
-                    # Se o processo atual ainda tiver tempo restante, coloca-o de volta na fila de processos prontos
-                    self.memoria.fila_prontos.append(self.processo_atual)
-                    break
+                            # Se o processo atual ainda tiver tempo restante, coloca-o de volta na fila de processos prontos
+                            self.memoria.fila_prontos.append(
+                                self.processo_atual)
+                            break
+                        else:
+                            self.processo_atual.tempo_ja_ocupou_cpu += 1
+                            self.processo_atual.tempo_restante -= 1
+                            instrucao = instrucao.strip()
+                            if instrucao.startswith('.'):
+                                secao = instrucao
+                                self.secao = secao
+                                self.processo_atual.status_secao = self.secao
+                                self.pc += 1
+                                continue
+                            if secao == '.data':
+                                variavel, valor = instrucao.split()
+                                self.memoria.memoria_ram[variavel] = int(valor)
+                                for chave, valor in self.memoria.memoria_ram.items():
+                                    print(f'Valor de {chave} = {valor}')
+                                self.pc += 1
+                            elif secao == '.code':
+                                self.executar_instrucao(instrucao)
+                                self.pc += 1
+                            elif secao == '.enddata':
+                                self.pc += 1
+                            elif secao == '.endcode':
+                                break
+                            else:
+                                raise Exception(f'Seção Inválida: {secao}')
+                    else:
+                        self.processo_atual.tempo_ja_ocupou_cpu += 1
+                        self.processo_atual.tempo_restante -= 1
+                        instrucao = instrucao.strip()
+                        if instrucao.startswith('.'):
+                            secao = instrucao
+                            self.secao = secao
+                            self.processo_atual.status_secao = self.secao
+                            self.pc += 1
+                            continue
+                        if secao == '.data':
+                            variavel, valor = instrucao.split()
+                            self.memoria.memoria_ram[variavel] = int(valor)
+                            for chave, valor in self.memoria.memoria_ram.items():
+                                print(f'Valor de {chave} = {valor}')
+                            self.pc += 1
+                        elif secao == '.code':
+                            self.executar_instrucao(instrucao)
+                            self.pc += 1
+                        elif secao == '.enddata':
+                            self.pc += 1
+                        elif secao == '.endcode':
+                            break
+                        else:
+                            raise Exception(f'Seção Inválida: {secao}')
         print('\nFim do Sistema de Execução Dinâmica de Processos\n')
 
     def executar_instrucao(self, instr):
