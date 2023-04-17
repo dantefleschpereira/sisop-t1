@@ -1,4 +1,4 @@
-def calcular_waiting_time(fila_processos):
+def calcular_waiting_time_sjf(fila_processos):
     n = len(fila_processos) # Quantidade de processos na fila
 
     # Criar uma lista vazia para armazenar o tempo de espera de cada processo
@@ -42,7 +42,7 @@ if __name__ == '__main__':
         {'pid': 3, 'tempo_chegada': 1, 'tempo_execucao': 11},
     ]
 
-    waiting_time = calcular_waiting_time(lista_processos)
+    waiting_time = calcular_waiting_time_sjf(lista_processos)
 
     # Imprime o tempo de espera de cada processo
     for i in range(len(waiting_time)):
