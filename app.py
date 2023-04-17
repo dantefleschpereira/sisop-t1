@@ -17,11 +17,11 @@ if escalonador == "1":
 
     # Cria um loop para receber as informações de cada processo
     for i in range(quantidade_programas):
-        #arquivo = input(f"Qual o nome do arquivo {i+1}? ")
-        #tempo_chegada = int(input("Qual o instante da carga? "))
-        #prioridade = int(input("Qual a prioridade do processo? "))
-        #quantum = int(input("Qual o quantum do processo? "))
-        #tempo_execucao = int(input("Qual o tempo de execução do processo? "))
+        arquivo = input(f"Qual o nome do arquivo {i+1}? ")
+        tempo_chegada = int(input("Qual o tempo de chegada? "))
+        prioridade = int(input("Qual a prioridade do processo? "))
+        quantum = int(input("Qual o quantum do processo? "))
+        tempo_execucao = int(input("Qual o tempo de execução do processo? "))
         print()
 
         # Cria um processo
@@ -32,7 +32,7 @@ if escalonador == "1":
         process = Processo(tempo_chegada=0, prioridade=1, quantum=1, tempo_execucao=1)
         process.carregar_instrucoes('programa01.txt')
 
-        # Adiciona o processo na lista de processos prontos
+        # Adiciona o processo na lista de processos prontos        
         cpu_.adicionar_processo(process)
 
     # Executa Round Robin
@@ -45,7 +45,7 @@ elif escalonador == "2":
     # Cria um loop para receber as informações de cada processo
     for i in range(quantidade_programas):
         arquivo = input(f"Qual o nome do arquivo {i+1}? ")
-        tempo_chegada = int(input("Qual o instante da carga? "))
+        tempo_chegada = int(input("Qual o tempo de chegada? "))
         tempo_execucao = int(input("Qual o tempo de execução do processo? "))
 
         # Cria um processo

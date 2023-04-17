@@ -3,11 +3,17 @@ import re
 class Processo:
 
     # Essa linha possibilita gerar ids sequenciais automaticamente para cada processo criado
-    proximo_id = 1
+    proximo_pid = 1
 
     # Construtor com os atributos de um processo
-    def __init__(self, id=None, logica=None, tempo_chegada=None, prioridade=None, quantum=None, tempo_execucao=None):
-        self.id = Processo.proximo_id
+    def __init__(self, logica=None, tempo_chegada=None, prioridade=None, quantum=None, tempo_execucao=None):
+
+        self.pid = Processo.proximo_pid
+        self.status_pc = 0
+        self.status_acc = 0
+        self.status_secao = ''
+        self.tempo_ja_ocupou_cpu = 0
+        self.estado = 'new'
         self.logica = logica
         self.memDados = {}
         self.memIns = []
@@ -16,11 +22,11 @@ class Processo:
         self.quantum = quantum
         self.tempo_execucao = tempo_execucao
         self.tempo_restante = tempo_execucao
-        Processo.proximo_id += 1
-        # Incluir "estado"?
+
+        Processo.proximo_pid += 1
 
     def __repr__(self):
-        return f"Processo {self.id} (prioridade: {self.prioridade}, quantum: {self.quantum}, tempo execução: {self.tempo_execucao}, tempo restante: {self.tempo_restante})"
+        return f"Processo {self.pid} (prioridade: {self.prioridade}, quantum: {self.quantum}, tempo execução: {self.tempo_execucao}, tempo chegada: {self.tempo_chegada} , tempo restante: {self.tempo_restante})"
 
     # Carrega as instruções que estão no arquivo.txt direto na logica do processo
     def carregar_instrucoes(self, nome_do_arquivo):
