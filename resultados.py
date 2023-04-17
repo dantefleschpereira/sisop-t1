@@ -14,6 +14,7 @@ def calcular_waiting_time_sjf(fila_processos):
     # Tempo de espera de cada processo
     for i in range(n):
         # Tempo de início do processo
+        # Calcula o tempo de início do processo i como o máximo entre o tempo de término do processo anterior e o tempo de chegada do processo atual.
         tempo_inicio = max(
             tempo_termino_anterior, processos_ordenados[i]['tempo_chegada'])
 
