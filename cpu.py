@@ -49,6 +49,7 @@ class Cpu:
                 programa = programa[self.processo_atual.status_pc:]
 
             for instrucao in programa:
+                # Se tempo_restante = tempo_execução signica que é a primeira vez que o processo é executado
                 if self.processo_atual.tempo_restante == self.processo_atual.tempo_execucao:
                     self.processo_atual.tempo_ja_ocupou_cpu += 1
                     self.processo_atual.tempo_restante -= 1
@@ -75,11 +76,13 @@ class Cpu:
                     else:
                         raise Exception(f'Seção Inválida: {secao}')
                 else:
+                    # Se não for a primeira vez que o processo é executado...
                     print('Verificando chegada de processos...')
+                    # Verifica se há processo na fila de prontos
                     if len(self.memoria.fila_prontos) > 0:
-                        # precisa verificar se tem o menor tempo de exec na fila de processos a cada instrucao
                         menor_tempo_execucao = min(
                             self.memoria.fila_prontos, key=lambda x: x.tempo_execucao)
+                        # precisa verificar se tem o menor tempo de exec na fila de processos a cada instrucao
                         if self.processo_atual.tempo_restante > menor_tempo_execucao.tempo_restante:
 
                             # Guarda as informações de onde o processo parou
@@ -92,7 +95,7 @@ class Cpu:
                             self.processo_atual.tempo_ja_ocupou_cpu = 0
                             self.pc = 0
 
-                            # Se o processo atual ainda tiver tempo restante, coloca-o de volta na fila de processos prontos
+                            # Coloca-o de volta na fila de processos prontos
                             self.memoria.fila_prontos.append(
                                 self.processo_atual)
                             break
@@ -210,10 +213,11 @@ class Cpu:
                 else:
                     # Se não for a primeira vez que o processo é executado...
                     print('Verificando chegada de processos...')
+                    # Verifica se há processo na fila de prontos
                     if len(self.memoria.fila_prontos) > 0:
-                        # precisa verificar se tem a prioridade de exec na fila de processos prontos a cada instrucao
                         processo_prioritario = min(
                             self.memoria.fila_prontos, key=lambda x: x.prioridade)
+                        # Precisa verificar se tem a prioridade de exec na fila de processos prontos a cada instrucao
                         if self.processo_atual.prioridade > processo_prioritario.prioridade:
 
                             # Guarda as informações de onde o processo parou
@@ -226,7 +230,7 @@ class Cpu:
                             self.processo_atual.tempo_ja_ocupou_cpu = 0
                             self.pc = 0
 
-                            # Se o processo atual ainda tiver tempo restante, coloca-o de volta na fila de processos prontos
+                            # Coloca-o de volta na fila de processos prontos
                             self.memoria.fila_prontos.append(
                                 self.processo_atual)
                             break
