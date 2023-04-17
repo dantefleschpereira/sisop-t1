@@ -40,16 +40,15 @@ class Cpu:
             # Caso diferente significa que o programa já foi executado algum vez então é preciso salvar as info
             if self.processo_atual.tempo_restante != self.processo_atual.tempo_execucao:
                 self.secao = self.processo_atual.status_secao
-                secao = self.secao #?
+                secao = self.secao  # ?
                 self.pc = self.processo_atual.status_pc
                 self.acc = self.processo_atual.status_acc
                 self.processo_atual.estado = "ready"
 
-                # Fatiar programa para continuar de onde parou
+                # Fatiar programa conforme pc para continuar de onde parou
                 programa = programa[self.processo_atual.status_pc:]
 
             for instrucao in programa:
-
                 if self.processo_atual.tempo_restante == self.processo_atual.tempo_execucao:
                     self.processo_atual.tempo_ja_ocupou_cpu += 1
                     self.processo_atual.tempo_restante -= 1
@@ -82,15 +81,14 @@ class Cpu:
                         menor_tempo_execucao = min(
                             self.memoria.fila_prontos, key=lambda x: x.tempo_execucao)
                         if self.processo_atual.tempo_restante > menor_tempo_execucao.tempo_restante:
+
                             # Guarda as informações de onde o processo parou
                             print(
                                 'Fim do tempo de ocupação do processo no processador')
-
                             self.processo_atual.status_pc = self.pc
                             self.processo_atual.status_acc = self.acc
                             self.processo_atual.status_secao = self.secao
                             self.processo_atual.estado = "ready"
-
                             self.processo_atual.tempo_ja_ocupou_cpu = 0
                             self.pc = 0
 
@@ -154,7 +152,6 @@ class Cpu:
     def rr(self):
 
         self.memoria.fila_prontos.sort(key=lambda x: x.tempo_chegada)
-        # self.memoria.fila_prontos.sort(key=lambda x: x.prioridade)
 
         while self.memoria.fila_prontos:
 
@@ -175,12 +172,12 @@ class Cpu:
             # Caso diferente significa que o programa já foi executado algum vez então é preciso salvar as info
             if self.processo_atual.tempo_restante != self.processo_atual.tempo_execucao:
                 self.secao = self.processo_atual.status_secao
-                secao = self.secao #?
+                secao = self.secao  # ?
                 self.pc = self.processo_atual.status_pc
                 self.acc = self.processo_atual.status_acc
                 self.processo_atual.estado = "ready"
 
-                # Fatiar programa para continuar de onde parou
+                # Fatiar programa conforme pc para continuar de onde parou
                 programa = programa[self.processo_atual.status_pc:]
 
             for instrucao in programa:
@@ -218,15 +215,14 @@ class Cpu:
                         processo_prioritario = min(
                             self.memoria.fila_prontos, key=lambda x: x.prioridade)
                         if self.processo_atual.prioridade > processo_prioritario.prioridade:
+
                             # Guarda as informações de onde o processo parou
                             print(
                                 'Fim do tempo de ocupação do processo no processador')
-
                             self.processo_atual.status_pc = self.pc
                             self.processo_atual.status_acc = self.acc
                             self.processo_atual.status_secao = self.secao
                             self.processo_atual.estado = "ready"
-
                             self.processo_atual.tempo_ja_ocupou_cpu = 0
                             self.pc = 0
 
@@ -285,8 +281,6 @@ class Cpu:
                         else:
                             raise Exception(f'Seção Inválida: {secao}')
         print('\nFim do Sistema de Execução Dinâmica de Processos\n')
-
- 
 
     def executar_instrucao(self, instr):
         operacao, op1 = instr.split()
