@@ -172,7 +172,7 @@ class Cpu:
             # Caso diferente significa que o programa já foi executado algum vez então é preciso salvar as info
             if self.processo_atual.tempo_restante != self.processo_atual.tempo_execucao:
                 self.secao = self.processo_atual.status_secao
-                secao = self.secao  # ?
+                secao = self.secao
                 self.pc = self.processo_atual.status_pc
                 self.acc = self.processo_atual.status_acc
                 self.processo_atual.estado = "ready"
