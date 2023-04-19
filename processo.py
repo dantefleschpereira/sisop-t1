@@ -1,3 +1,5 @@
+import queue
+import random
 import re
 
 class Processo:
@@ -11,8 +13,9 @@ class Processo:
         self.pid = Processo.proximo_pid
         self.status_pc = 0
         self.status_acc = 0
-        self.status_secao = ''
-        self.tempo_ja_ocupou_cpu = 0
+        self.runningTime = 0
+        self.turnAround = 0
+        self.waitTime = 0
         self.estado = 'new'
         self.logica = logica
         self.memDados = {}
@@ -20,13 +23,32 @@ class Processo:
         self.tempo_chegada = tempo_chegada
         self.prioridade = prioridade
         self.quantum = quantum
+        self.quantumRemainder = quantum
         self.tempo_execucao = tempo_execucao
         self.tempo_restante = tempo_execucao
 
         Processo.proximo_pid += 1
 
     def __repr__(self):
-        return f"Processo {self.pid} (prioridade: {self.prioridade}, quantum: {self.quantum}, tempo execução: {self.tempo_execucao}, tempo chegada: {self.tempo_chegada} , tempo restante: {self.tempo_restante})"
+        #return f"Processo {self.pid} (prioridade: {self.prioridade}, quantum: {self.quantum}, tempo execução: {self.tempo_execucao}, tempo chegada: {self.tempo_chegada} , tempo restante: {self.tempo_restante})"
+        return f"Processo {self.pid}. Prioridade: {self.prioridade} Chegada {self.tempo_chegada}"
+
+    def __eq__(self, other) -> bool:
+        return self.prioridade == other.prioridade
+    
+    def __lt__(self, other) -> bool:
+        #print(f'Processo {self.pid} < Processo {other.pid}')
+        if self == other:
+            #print(f'Tempo Chegada {self.tempo_chegada} < {other.tempo_chegada} = {self.tempo_chegada < other.tempo_chegada}')
+            return self.tempo_chegada < other.tempo_chegada
+        #print(f'Prioridade {self.prioridade} < {other.prioridade} = {self.prioridade < other.prioridade}')
+        return self.prioridade < other.prioridade
+    
+    def __le__(self, other) -> bool:
+        if self < other: return True
+        if self == other: return True
+        return False
+        ...
 
     # Carrega as instruções que estão no arquivo.txt direto na logica do processo
     def carregar_instrucoes(self, nome_do_arquivo):
@@ -50,13 +72,14 @@ class Processo:
         raise Exception(f'.enddata not found')
         
     def parseIns(self, instrucoes):
-        branchAux = {}
         labelAux = {}
         noIdLabel = {}
         instrucoes.pop(0)
         for n in range(len(instrucoes)):
             instrucao = instrucoes[0].strip()
             if(instrucao == '.endcode'):
+                if len(noIdLabel) > 0:
+                    raise Exception(f'Found jump commands with invalid Labels {noIdLabel}')
                 self.memIns.append(instrucoes.pop(0))
                 return
             aux = re.search(r"^(\w+):(\s(\w+\s\w+))?", instrucao)
@@ -104,6 +127,22 @@ class Processo:
         print(self.memDados)
         print(self.memIns)
 
-process = Processo(tempo_chegada=0, prioridade=1, quantum=1, tempo_execucao=1)
-process.carregar_instrucoes('programa04.txt')
-process.compile()
+#process = Processo(tempo_chegada=0, prioridade=1, quantum=1, tempo_execucao=1)
+#process.carregar_instrucoes('programa04.txt')
+#process.compile()
+#
+#processos = []
+#for i in range(10):
+#    processo = Processo(logica=random.choice([True, False]),
+#                        tempo_chegada=random.randint(1, 10),
+#                        prioridade=random.randint(1, 3),
+#                        quantum=random.randint(1, 5),
+#                        tempo_execucao=random.randint(5, 20))
+#    processos.append(processo)
+## put the processes into a priority queue based on their priority attribute
+#lista = queue.PriorityQueue()
+#for processo in processos:
+#    lista.put((processo))
+#
+#while not lista.empty():
+#    print(f'{lista.queue[0]} {lista.get()}')

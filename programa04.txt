@@ -12,7 +12,6 @@ loop:
     load a
     sub #1
     store a
-
     syscall 1
     brpos loop
     syscall 0
