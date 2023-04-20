@@ -1,11 +1,13 @@
-import queue
-import random
 import re
 
 class Processo:
 
     # Essa linha possibilita gerar ids sequenciais automaticamente para cada processo criado
     proximo_pid = 1
+    escalanador = ''
+
+    def setEscalanador(modo:str):
+        Processo.escalanador = modo
 
     # Construtor com os atributos de um processo
     def __init__(self, logica=None, tempo_chegada=None, prioridade=None, quantum=None, tempo_execucao=None):
@@ -13,9 +15,11 @@ class Processo:
         self.pid = Processo.proximo_pid
         self.status_pc = 0
         self.status_acc = 0
-        self.runningTime = 0
+        self.processingTime = 0
         self.turnAround = 0
-        self.waitTime = 0
+        self.waitingTime = 0
+        self.finalizedTime = 0
+        self.blockedTime = 0
         self.estado = 'new'
         self.logica = logica
         self.memDados = {}
@@ -25,7 +29,9 @@ class Processo:
         self.quantum = quantum
         self.quantumRemainder = quantum
         self.tempo_execucao = tempo_execucao
-        self.tempo_restante = tempo_execucao
+        self.modo = []
+        self.modo.append(self.prioridade if Processo.escalanador == '1' else self.tempo_execucao)
+        print(self.modo[0])
 
         Processo.proximo_pid += 1
 
@@ -34,7 +40,7 @@ class Processo:
         return f"Processo {self.pid}. Prioridade: {self.prioridade} Chegada {self.tempo_chegada}"
 
     def __eq__(self, other) -> bool:
-        return self.prioridade == other.prioridade
+        return self.modo[0] == other.modo[0]
     
     def __lt__(self, other) -> bool:
         #print(f'Processo {self.pid} < Processo {other.pid}')
@@ -42,7 +48,7 @@ class Processo:
             #print(f'Tempo Chegada {self.tempo_chegada} < {other.tempo_chegada} = {self.tempo_chegada < other.tempo_chegada}')
             return self.tempo_chegada < other.tempo_chegada
         #print(f'Prioridade {self.prioridade} < {other.prioridade} = {self.prioridade < other.prioridade}')
-        return self.prioridade < other.prioridade
+        return self.modo[0] < other.prioridade
     
     def __le__(self, other) -> bool:
         if self < other: return True
