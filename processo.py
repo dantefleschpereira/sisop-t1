@@ -55,7 +55,6 @@ class Processo:
         if self < other: return True
         if self == other: return True
         return False
-        ...
 
     # Carrega as instruções que estão no arquivo.txt direto na logica do processo
     def carregar_instrucoes(self, nome_do_arquivo):
@@ -164,3 +163,8 @@ class Processo:
                 print(self.memIns)
         print(self.memDados)
         print(self.memIns)
+
+    
+    def getStatistics(self):
+        self.turnAround = self.waitingTime + self.processingTime + self.blockedTime
+        print(f'PROCESSO {self.pid}\nTURN_AROUND: {self.turnAround}\nPROCESSING_TIME: {self.processingTime}\nBLOCKED_TIME: {self.blockedTime}\nWAITING_TIME: {self.waitingTime}\nFINALIZED_TIME: {self.finalizedTime}')

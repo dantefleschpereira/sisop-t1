@@ -41,6 +41,9 @@ class Cpu:
         if self.fila_prontos.empty():
             if self.processo_atual is None and not self.fila_bloqueados:
                 print('Todos os Processos foram encerrados')
+                for processo in self.listaProcessos:
+                    processo.getStatistics()
+                    print()
                 exit(0)
             return self.processo_atual
         else:
@@ -85,7 +88,7 @@ class Cpu:
                     self.processo_atual.quantumRemainder -= 1
                 else:
                     #Se, sim salva o contexto e para de executar processo, colocando o novamente na fila de processos prontos
-                    print(f'\n      Quantum {self.processo_atual} estourado. DESALOCANDO\n')
+                    print(f'\n      Quantum PROCESSO {self.processo_atual.pid} estourado. DESALOCANDO\n')
                     self.processo_atual.quantumRemainder = self.processo_atual.quantum
                     self.processo_atual.tempo_chegada = self.tempo
                     self.processo_atual.estado = 'waiting'
@@ -98,9 +101,12 @@ class Cpu:
             
             # Executa o processo
             instrucao = self.memIns[self.pc]
-            print(f'    {self.processo_atual}\n         {instrucao}')
+            print(f'    PROCESSO {self.processo_atual.pid}\n         {instrucao}')
             if(instrucao == '.endcode'): 
-                print(f"    {self.processo_atual} encerrado")
+                print(f"    PROCESSO {self.processo_atual.pid} encerrado")
+                self.processo_atual.estado = 'exit'
+                print(self.memDados)
+                self.processo_atual.getStatistics()
                 self.processo_atual = None
                 continue
 
@@ -193,8 +199,9 @@ class Cpu:
         if indice == '0':
             print('     Esse processo foi encerrado por syscall')
             self.processo_atual.estado = "exit"
-            print(f"    {self.processo_atual} encerrado")
+            print(f"    PROCESSO {self.processo_atual.pid} encerrado")
             print(self.memDados)
+            self.processo_atual.getStatistics()
             self.processo_atual = None
             return
         elif indice == '1' or indice == '2':
