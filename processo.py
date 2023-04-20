@@ -77,7 +77,7 @@ class Processo:
             print(memoria.pop(0))
             print(len(memoria))
             print()
-        raise Exception(f'.enddata not found')
+        raise Exception(f'.enddata não foi encontrado')
         
     # Le o campo de instrucoes
     def parseIns(self, instrucoes):
@@ -91,7 +91,7 @@ class Processo:
             #Se for um endcode termine
             if(instrucao == '.endcode'):
                 if len(noIdLabel) > 0:
-                    raise Exception(f'Found jump commands with invalid Labels {noIdLabel}')
+                    raise Exception(f'Encontrado comando de salto com label inválido {noIdLabel}')
                 self.memIns.append(instrucoes.pop(0))
                 return
             #Verifica se instrucao possui uma label em um dos seguintes padroes
@@ -105,7 +105,7 @@ class Processo:
                 label = aux.group(1)
                 #se label for duplicata Exception
                 if label in labelAux:
-                    raise Exception(f'label {label} found in two instances\nLine {labelAux.get(label)} and in Line {n}')
+                    raise Exception(f'label {label} encontrado mais de uma vez\nLinha {labelAux.get(label)} e na linha {n}')
                 labelAux[label] = n
                 #se label ja tiver sido invocada por uma instrucao branch
                 if label in noIdLabel.keys():
@@ -147,7 +147,7 @@ class Processo:
             #adicione instrucao a memIns e a remova da lista de instrucoes
             self.memIns.append(instrucao)
             instrucoes.pop(0)
-        raise Exception(f'.endcode not found')
+        raise Exception(f'.endcode não encontrado')
             
     def compile(self):
         programa = self.logica.splitlines()
