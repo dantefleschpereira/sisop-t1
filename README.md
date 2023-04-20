@@ -13,7 +13,7 @@ Requisitos:
 Este sistema foi escrito em Python 3. É necessário ter uma instalação do Python 3 para executá-lo.
 
 Grupo:
-Dante Pereira
-Gabriel Decian
-Gabriel Moszkowicz
-Guilherme Specht
+Dante Pereira,
+Gabriel Decian,
+Gabriel Moszkowicz,
+Guilherme Specht.
