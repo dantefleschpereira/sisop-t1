@@ -30,6 +30,7 @@ class Processo:
         self.quantumRemainder = quantum
         self.tempo_execucao = tempo_execucao
         self.modo = []
+        #Seleciona propriedade a ser usada na comparação entre processos de acordo com o modo de escalonamento
         self.modo.append(self.prioridade if Processo.escalanador == '1' else self.tempo_execucao)
         print(self.modo[0])
 
@@ -61,6 +62,7 @@ class Processo:
         with open(nome_do_arquivo, 'r') as instrucoes:
             self.logica = instrucoes.read()
 
+    # Le o campo da Memoria
     def parseMem(self, memoria):
         print(memoria.pop(0))
         for n in range(len(memoria)):
@@ -77,42 +79,72 @@ class Processo:
             print()
         raise Exception(f'.enddata not found')
         
+    # Le o campo de instrucoes
     def parseIns(self, instrucoes):
         labelAux = {}
         noIdLabel = {}
         instrucoes.pop(0)
+        #Itera lista de instrucoes
         for n in range(len(instrucoes)):
+            #Pega primeiro item da lista, removendo-o
             instrucao = instrucoes[0].strip()
+            #Se for um endcode termine
             if(instrucao == '.endcode'):
                 if len(noIdLabel) > 0:
                     raise Exception(f'Found jump commands with invalid Labels {noIdLabel}')
                 self.memIns.append(instrucoes.pop(0))
                 return
+            #Verifica se instrucao possui uma label em um dos seguintes padroes
+            # loop: add 1
+            # ou
+            # loop:
+            # add 1
             aux = re.search(r"^(\w+):(\s(\w+\s\w+))?", instrucao)
             if(aux):
+                #pega o trecho label:
                 label = aux.group(1)
+                #se label for duplicata Exception
                 if label in labelAux:
                     raise Exception(f'label {label} found in two instances\nLine {labelAux.get(label)} and in Line {n}')
                 labelAux[label] = n
+                #se label ja tiver sido invocada por uma instrucao branch
                 if label in noIdLabel.keys():
+                    #para cada instrucao branch que invoca esta label
                     for i in noIdLabel.get(label):
+                        #substitua a label na instrucao pelo numeral representante da linha em que a label foi encontrada
                         self.memIns[i] = re.sub(label, f'{n}', self.memIns[i])
+                    #removo-a do dicionario noIdLabel (labels, [branches]) para labels ainda não identificadas
                     noIdLabel.pop(label)
+
+                #Se label estiver sozinha em sua propria linha 
+                #ex. loop:
+                #remova-a da lista e continue a iteracao
                 if(aux.group(2) == None):
                     instrucoes.pop(0)
                     continue
+                #caso contrario
+                #loop: add 1
+                #recupera a instrucao e adiciona a memoria de instrucao memIns
                 instrucao = aux.group(3)
+            #separa instrucao do operando
             op, valor = instrucao.split()
+            #se for uma instrucao branch
             if(re.search(r"^br", op)):
+                #verifique se a label ja foi encontrada
                 if valor in labelAux:
+                    #se sim, subsititua label com numeral representante da linha em que label se encontra
                     labelPos = labelAux.get(valor)
                     self.memIns.append(f'{op} {labelPos}')
                     instrucoes.pop(0)
                     continue
+                #se nao, e label ainda nao estiver no dicionario (labels, [branches]) noIdLabel, adicione-a de maneira a mapear uma lista
+                #de todas as instrucoes de branch que invocam esta mesma label
                 elif valor not in noIdLabel.keys():
                     noIdLabel[valor] = [n]
+                #se label ja estiver no dicionario noIdLabel, adicione instrucao a lista mapeada pela label
                 else:
                     noIdLabel[valor].append(n)
+            #adicione instrucao a memIns e a remova da lista de instrucoes
             self.memIns.append(instrucao)
             instrucoes.pop(0)
         raise Exception(f'.endcode not found')
@@ -132,23 +164,3 @@ class Processo:
                 print(self.memIns)
         print(self.memDados)
         print(self.memIns)
-
-#process = Processo(tempo_chegada=0, prioridade=1, quantum=1, tempo_execucao=1)
-#process.carregar_instrucoes('programa04.txt')
-#process.compile()
-#
-#processos = []
-#for i in range(10):
-#    processo = Processo(logica=random.choice([True, False]),
-#                        tempo_chegada=random.randint(1, 10),
-#                        prioridade=random.randint(1, 3),
-#                        quantum=random.randint(1, 5),
-#                        tempo_execucao=random.randint(5, 20))
-#    processos.append(processo)
-## put the processes into a priority queue based on their priority attribute
-#lista = queue.PriorityQueue()
-#for processo in processos:
-#    lista.put((processo))
-#
-#while not lista.empty():
-#    print(f'{lista.queue[0]} {lista.get()}')

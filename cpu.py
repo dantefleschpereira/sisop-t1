@@ -36,13 +36,15 @@ class Cpu:
                 self.fila_prontos.put(self.fila_bloqueados.pop(0))
             else:
                 break
-            
+        
+        #Se fila de pronts, bloqueados estiverem vazias e o processo atual for None, encerre o programa
         if self.fila_prontos.empty():
             if self.processo_atual is None and not self.fila_bloqueados:
                 print('Todos os Processos foram encerrados')
                 exit(0)
             return self.processo_atual
         else:
+            #Pega o proximo processo da fila e verifica se este tem prioridade sobre o processo atual
             nextProcess = self.fila_prontos.queue[0]
             if self.processo_atual is None:
                 self.processo_atual = self.fila_prontos.get()
@@ -50,13 +52,15 @@ class Cpu:
                 if self.processo_atual <= nextProcess: 
                     return self.processo_atual
                 else:
+                    #Salva contexto
                     print(f'    {self.processo_atual} DESALOCADO')
                     self.fila_prontos.get()
                     self.processo_atual.estado = 'waiting'
                     self.processo_atual.status_acc = self.acc
                     self.processo_atual.status_pc = self.pc
                     self.fila_prontos.put(self.processo_atual)
-            
+
+            #Troca de contexto 
             print(f'    ALOCANDO {nextProcess}')
             self.processo_atual = nextProcess
             self.processo_atual.estado = 'running'
@@ -80,6 +84,7 @@ class Cpu:
                 if self.processo_atual.quantumRemainder:
                     self.processo_atual.quantumRemainder -= 1
                 else:
+                    #Se, sim salva o contexto e para de executar processo, colocando o novamente na fila de processos prontos
                     print(f'\n      Quantum {self.processo_atual} estourado. DESALOCANDO\n')
                     self.processo_atual.quantumRemainder = self.processo_atual.quantum
                     self.processo_atual.tempo_chegada = self.tempo
@@ -98,8 +103,8 @@ class Cpu:
                 print(f"    {self.processo_atual} encerrado")
                 self.processo_atual = None
                 continue
+
             for processo in self.listaProcessos:
-                ...
                 match processo.estado:
                     case 'waiting':
                         processo.waitingTime += 1
@@ -186,7 +191,6 @@ class Cpu:
     def operacoes_syscall(self, indice):
         tempo_espera = random.randint(8, 10)
         if indice == '0':
-            # exit(0)
             print('     Esse processo foi encerrado por syscall')
             self.processo_atual.estado = "exit"
             print(f"    {self.processo_atual} encerrado")
